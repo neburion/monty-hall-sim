@@ -1,0 +1,8 @@
+bin/
+build/
+shell.nix
+compile_commands.json
+.cache/
+.direnv/
+.envrc
+.envrc
