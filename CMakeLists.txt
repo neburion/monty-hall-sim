@@ -15,10 +15,20 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 macro(apply_flags TARGET)
-    target_compile_options(${TARGET} PRIVATE
-        $<$<CONFIG:Debug>:${WARN_FLAGS} ${SANITIZE_FLAGS}>)
-    target_link_options(${TARGET} PRIVATE
-        $<$<CONFIG:Debug>:${SANITIZE_FLAGS}>)
+    if(MSVC)
+        target_compile_options(${TARGET} PRIVATE
+            $<$<CONFIG:Debug>:/W4>)
+    else()
+        if(APPLE)
+            set(SANITIZE_FLAGS -fsanitize=undefined,address)
+        else()
+            set(SANITIZE_FLAGS -fsanitize=undefined,address,leak)
+        endif()
+        target_compile_options(${TARGET} PRIVATE
+            $<$<CONFIG:Debug>:-Wall -Wextra -Wpedantic ${SANITIZE_FLAGS}>)
+        target_link_options(${TARGET} PRIVATE
+            $<$<CONFIG:Debug>:${SANITIZE_FLAGS}>)
+    endif()
 endmacro()
 # =================================================================================================
 # Sources
